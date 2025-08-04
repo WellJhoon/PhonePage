@@ -1,68 +1,96 @@
 # Sistema de Gestión de Tienda de Celulares
 
-Aplicación web desarrollada con .NET C# (Backend) y Angular (Frontend) para la gestión completa de una tienda de celulares.
+Aplicación web desarrollada con .NET 9 (Backend) y Angular 19 (Frontend) para la gestión completa de una tienda de celulares con sistema de roles y variantes de productos por color.
 
 ## Características Principales
 
 ### Funcionalidades Implementadas
 - **Gestión de Celulares**: CRUD completo con variantes por color y precio
-- **Gestión de Usuarios**: Administración completa de usuarios
-- **Autenticación por Roles**: Sistema de permisos diferenciados
+- **Gestión de Usuarios**: Administración completa de usuarios con roles
+- **Autenticación JWT**: Sistema de autenticación seguro con tokens
+- **Sistema de Roles**: Permisos diferenciados por tipo de usuario
+- **Carrito de Compras**: Funcionalidad completa de carrito
 - **Catálogo Dinámico**: Visualización de celulares con filtros y búsqueda
 - **Paginación**: Navegación eficiente por grandes volúmenes de datos
 
 ### Sistema de Roles
 - **Admin**: Crear, Modificar, Eliminar, Ver (celulares y usuarios)
 - **Seller**: Crear, Modificar, Ver (solo celulares)
-- **User**: Ver (solo celulares)
+- **User**: Ver (solo celulares) + Carrito de compras
 
 ### Tecnologías Utilizadas
 
 #### Backend
-- .NET 8 Web API
+- .NET 9 Web API
 - Entity Framework Core
 - SQL Server LocalDB
 - JWT Authentication
 - BCrypt para seguridad de contraseñas
+- Swagger para documentación API
 
 #### Frontend
-- Angular 15
-- Angular Material
+- Angular 19 (Standalone Components)
 - TypeScript
 - Responsive Design
+- HTTP Client para comunicación con API
 
 ## Estructura del Proyecto
 
 ```
 SolvexPruebaTecnica/
-├── ClothingStoreApi/           # Backend .NET
-│   ├── Models/                 # Modelos de datos
-│   ├── Data/                   # Contexto de base de datos
+├── BackendIphoneStore/         # Backend .NET 9
 │   ├── Controllers/            # Controladores API
-│   ├── Services/               # Servicios de negocio
+│   │   ├── AuthController.cs
+│   │   ├── ProductsController.cs
+│   │   ├── UsersController.cs
+│   │   └── CartController.cs
+│   ├── Models/                 # Modelos de datos
+│   │   ├── User.cs
+│   │   ├── Product.cs
+│   │   ├── ProductVariation.cs
+│   │   └── Cart.cs
+│   ├── DTOs/                   # Data Transfer Objects
+│   ├── Data/                   # DbContext y configuración
+│   ├── Services/               # Servicios (JWT)
 │   └── Program.cs              # Configuración principal
-├── ClothingStoreFrontend/      # Frontend Angular
+├── FrontendIphoneStore/        # Frontend Angular 19
 │   ├── src/app/
-│   │   ├── components/         # Componentes de UI
+│   │   ├── components/         # Componentes UI
+│   │   │   ├── login/
+│   │   │   ├── register/
+│   │   │   ├── products/
+│   │   │   ├── users/
+│   │   │   ├── cart/
+│   │   │   └── navbar/
 │   │   ├── services/           # Servicios HTTP
 │   │   ├── models/             # Interfaces TypeScript
-│   │   └── app.module.ts       # Módulo principal
+│   │   ├── guards/             # Guards de autenticación
+│   │   └── interceptors/       # Interceptores HTTP
 │   └── package.json
-└── README.md
+├── .gitignore
+├── README.md
+└── start-dev.bat              # Script de inicio automático
 ```
 
 ## Instalación y Ejecución
 
 ### Prerrequisitos
-- .NET 8 SDK
-- Node.js (v14 o superior)
+- .NET 9 SDK
+- Node.js (v18 o superior)
 - SQL Server LocalDB
 
-### Backend
+### Opción 1: Script Automático
+```bash
+# Ejecutar desde la raíz del proyecto
+start-dev.bat
+```
 
+### Opción 2: Manual
+
+#### Backend
 1. Navegar al directorio del API:
    ```bash
-   cd ClothingStoreApi/ClothingStoreApi
+   cd BackendIphoneStore/BackendIphoneStore
    ```
 
 2. Restaurar dependencias:
@@ -75,13 +103,12 @@ SolvexPruebaTecnica/
    dotnet run
    ```
 
-   La API estará disponible en: `https://localhost:7000`
+   La API estará disponible en: `https://localhost:5001`
 
-### Frontend
-
+#### Frontend
 1. Navegar al directorio del frontend:
    ```bash
-   cd ClothingStoreFrontend
+   cd FrontendIphoneStore
    ```
 
 2. Instalar dependencias:
@@ -99,26 +126,32 @@ SolvexPruebaTecnica/
 ## Credenciales de Acceso
 
 ### Usuario Administrador por Defecto
-- **Email**: admin@clothing.com
+- **Email**: admin@iphone.com
 - **Password**: admin123
-- **Rol**: Administrador
+- **Rol**: Admin
 
 ## Funcionalidades Detalladas
 
 ### Gestión de Celulares
 - Crear celulares con múltiples variantes de color
 - Cada variante puede tener precio diferente
-- Subida de imágenes mediante URL
+- Ejemplo: iPhone 15 (Negro: $1200, Azul: $1200, Verde: $1300)
 - Control de stock por variante
-- Búsqueda y filtrado
+- Búsqueda y filtrado por nombre/descripción
 - Paginación de resultados
 
 ### Gestión de Usuarios
-- Registro de nuevos usuarios
-- Asignación de roles
+- Registro de nuevos usuarios con roles
 - Visualización en tabla con paginación
-- Búsqueda por nombre o email
+- Búsqueda por nombre de usuario o email
+- Edición de usuarios (solo Admin)
 - Eliminación de usuarios (solo Admin)
+
+### Carrito de Compras
+- Agregar productos al carrito
+- Selección de variante (color) específica
+- Visualización de productos en carrito
+- Cálculo automático de totales
 
 ### Catálogo de Celulares
 - Visualización dinámica por color seleccionado
@@ -133,17 +166,22 @@ SolvexPruebaTecnica/
 - `POST /api/auth/register` - Registrar usuario
 
 ### Productos
-- `GET /api/products` - Listar celulares
-- `GET /api/products/{id}` - Obtener celular
-- `POST /api/products` - Crear celular
-- `PUT /api/products/{id}` - Actualizar celular
-- `DELETE /api/products/{id}` - Eliminar celular
+- `GET /api/products` - Listar celulares (con paginación y búsqueda)
+- `GET /api/products/{id}` - Obtener celular específico
+- `POST /api/products` - Crear celular (Admin/Seller)
+- `PUT /api/products/{id}` - Actualizar celular (Admin/Seller)
+- `DELETE /api/products/{id}` - Eliminar celular (Admin)
 
 ### Usuarios
 - `GET /api/users` - Listar usuarios (Admin)
-- `GET /api/users/{id}` - Obtener usuario (Admin)
+- `GET /api/users/{id}` - Obtener usuario específico (Admin)
 - `PUT /api/users/{id}` - Actualizar usuario (Admin)
 - `DELETE /api/users/{id}` - Eliminar usuario (Admin)
+
+### Carrito
+- `GET /api/cart` - Obtener carrito del usuario
+- `POST /api/cart` - Agregar producto al carrito
+- `DELETE /api/cart/{id}` - Eliminar producto del carrito
 
 ## Modelo de Datos
 
@@ -154,12 +192,18 @@ SolvexPruebaTecnica/
   "name": "iPhone 15",
   "description": "iPhone 15 con chip A17 Pro",
   "imageUrl": "https://ejemplo.com/iphone15.jpg",
-  "variants": [
+  "variations": [
     {
       "id": 1,
       "color": "Negro",
       "price": 1200.00,
-      "stock": 50
+      "stock": 25
+    },
+    {
+      "id": 2,
+      "color": "Verde",
+      "price": 1300.00,
+      "stock": 15
     }
   ]
 }
@@ -169,52 +213,68 @@ SolvexPruebaTecnica/
 ```json
 {
   "id": 1,
-  "name": "Juan Pérez",
-  "email": "juan@ejemplo.com",
-  "role": 2,
+  "username": "admin",
+  "email": "admin@iphone.com",
+  "role": "Admin",
   "createdAt": "2024-01-01T00:00:00Z"
+}
+```
+
+### Carrito
+```json
+{
+  "id": 1,
+  "userId": 1,
+  "productVariationId": 1,
+  "quantity": 2,
+  "addedAt": "2024-01-01T00:00:00Z"
 }
 ```
 
 ## Seguridad
 
-- Autenticación JWT con tokens seguros
-- Hash de contraseñas con BCrypt
-- Autorización basada en roles
-- Validación de datos en frontend y backend
-- CORS configurado para desarrollo
+- **Autenticación JWT**: Tokens seguros con expiración
+- **Autorización por roles**: Endpoints protegidos según permisos
+- **Hash de contraseñas**: BCrypt para almacenamiento seguro
+- **CORS**: Configurado para desarrollo
+- **Guards**: Protección de rutas en Angular
+- **Interceptores**: Manejo automático de tokens
+
+## Características Técnicas
+
+### Backend (.NET 9)
+- **Arquitectura**: Web API con patrón Repository
+- **Base de datos**: Entity Framework Core con SQL Server LocalDB
+- **Autenticación**: JWT Bearer tokens
+- **Documentación**: Swagger/OpenAPI
+- **Validación**: Data Annotations
+- **Inyección de dependencias**: Built-in DI container
+
+### Frontend (Angular 19)
+- **Arquitectura**: Standalone Components
+- **Estado**: Servicios con RxJS
+- **Routing**: Angular Router con guards
+- **HTTP**: HttpClient con interceptores
+- **Formularios**: Reactive Forms
+- **Responsive**: CSS Grid y Flexbox
 
 ## Patrones de Diseño Implementados
 
-- **Repository Pattern**: Para acceso a datos
-- **Dependency Injection**: En toda la aplicación
-- **Observer Pattern**: Para manejo de estado en Angular
-- **Factory Pattern**: Para creación de formularios dinámicos
+- **Repository Pattern**: Acceso a datos en el backend
+- **Dependency Injection**: En ambas aplicaciones
+- **Observer Pattern**: RxJS en Angular
+- **Guard Pattern**: Protección de rutas
+- **Interceptor Pattern**: Manejo de HTTP requests
 
-## Buenas Prácticas
+## URLs de Acceso
 
-### Backend
-- Separación de responsabilidades
-- Validación de modelos
-- Manejo centralizado de errores
-- Configuración por entornos
-- Documentación con Swagger
-
-### Frontend
-- Arquitectura por componentes
-- Servicios reutilizables
-- Reactive Forms
-- Interceptores HTTP
-- Tipado fuerte con TypeScript
+- **Frontend**: http://localhost:4200
+- **Backend API**: https://localhost:5001
+- **Swagger**: https://localhost:5001/swagger
 
 ## Desarrollo
 
-Para desarrollo local, ambas aplicaciones deben ejecutarse simultáneamente:
-
-1. Backend en `https://localhost:7000`
-2. Frontend en `http://localhost:4200`
-
-El frontend está configurado para comunicarse automáticamente con el backend local.
+Para desarrollo local, ambas aplicaciones deben ejecutarse simultáneamente. El frontend está configurado para comunicarse automáticamente con el backend local.
 
 ---
 
