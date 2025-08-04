@@ -1,0 +1,39 @@
+<div class="cart-container">
+  <h1>🛒 Mi Carrito</h1>
+  
+  <div *ngIf="cart.items.length === 0" class="empty-cart">
+    <p>Tu carrito está vacío</p>
+    <a routerLink="/products" class="continue-shopping">Continuar comprando</a>
+  </div>
+  
+  <div *ngIf="cart.items.length > 0" class="cart-content">
+    <div class="cart-items">
+      <div *ngFor="let item of cart.items" class="cart-item">
+        <div class="item-info">
+          <h3>{{ item.productName }}</h3>
+          <p class="color">Color: {{ item.color }}</p>
+          <p class="price">Precio: ${{ item.price }}</p>
+          <p class="quantity">Cantidad: {{ item.quantity }}</p>
+        </div>
+        <div class="item-actions">
+          <p class="subtotal">${{ item.subtotal }}</p>
+          <button (click)="removeFromCart(item.id)" class="remove-btn">
+            Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="cart-summary">
+      <div class="total">
+        <h2>Total: ${{ cart.total }}</h2>
+      </div>
+      <div class="checkout-actions">
+        <a routerLink="/products" class="continue-shopping">Continuar comprando</a>
+        <button (click)="checkout()" class="checkout-btn">
+          Comprar Ahora
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

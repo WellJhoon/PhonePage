@@ -1,0 +1,54 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Iniciar Sesión</h2>
+    
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="username">Usuario:</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username"
+          [(ngModel)]="loginData.username" 
+          required
+          class="form-control"
+          placeholder="Ingrese su usuario">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password"
+          [(ngModel)]="loginData.password" 
+          required
+          class="form-control"
+          placeholder="Ingrese su contraseña">
+      </div>
+      
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      
+      <button 
+        type="submit" 
+        class="login-btn"
+        [disabled]="loading || !loginForm.valid">
+        <span *ngIf="loading">Cargando...</span>
+        <span *ngIf="!loading">Iniciar Sesión</span>
+      </button>
+    </form>
+    
+    <div class="register-link">
+        <p>¿No tienes cuenta? <a routerLink="/register">Registrarse</a></p>
+    </div>
+    
+    <div class="demo-users">
+      <h3>Usuarios de prueba:</h3>
+      <p><strong>Admin:</strong> admin / admin123</p>
+      <p><strong>Seller:</strong> seller / seller123</p>
+      <p><strong>User:</strong> user / user123</p>
+    </div>
+  </div>
+</div>

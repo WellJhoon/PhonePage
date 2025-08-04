@@ -1,0 +1,136 @@
+<div class="users-container">
+  <div class="header">
+    <h1>Usuarios</h1>
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (keyup.enter)="onSearch()"
+        placeholder="Buscar usuarios..."
+        class="search-input">
+      <button (click)="onSearch()" class="search-btn">🔍</button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando usuarios...</div>
+
+  <div class="users-table" *ngIf="!loading">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Fecha de Creación</th>
+          <th *ngIf="canManageUsers()">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span class="role-badge" [class]="'role-' + user.role.toLowerCase()">
+              {{ user.role }}
+            </span>
+          </td>
+          <td>{{ user.createdAt | date:'short' }}</td>
+          <td *ngIf="canManageUsers()" class="actions">
+            <button (click)="openEditForm(user)" class="edit-btn">Editar</button>
+            <button 
+              (click)="deleteUser(user)" 
+              class="delete-btn"
+              [disabled]="user.id === currentUser?.id">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button 
+      (click)="onPageChange(currentPage - 1)" 
+      [disabled]="currentPage === 1"
+      class="page-btn">
+      Anterior
+    </button>
+    
+    <span class="page-info">
+      Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} usuarios)
+    </span>
+    
+    <button 
+      (click)="onPageChange(currentPage + 1)" 
+      [disabled]="currentPage === totalPages"
+      class="page-btn">
+      Siguiente
+    </button>
+  </div>
+
+  <!-- Modal de edición -->
+  <div *ngIf="showEditForm" class="modal-overlay" (click)="closeForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Editar Usuario</h2>
+      
+      <form (ngSubmit)="onSubmit()" #userFormRef="ngForm">
+        <div class="form-group">
+          <label>Usuario:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="userForm.username" 
+            name="username"
+            required
+            class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label>Email:</label>
+          <input 
+            type="email" 
+            [(ngModel)]="userForm.email" 
+            name="email"
+            required
+            class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label>Nueva Contraseña (opcional):</label>
+          <input 
+            type="password" 
+            [(ngModel)]="userForm.password" 
+            name="password"
+            class="form-control"
+            placeholder="Dejar vacío para mantener la actual">
+        </div>
+        
+        <div class="form-group">
+          <label>Rol:</label>
+          <select 
+            [(ngModel)]="userForm.role" 
+            name="role"
+            required
+            class="form-control">
+            <option [value]="UserRole.User">User</option>
+            <option [value]="UserRole.Seller">Seller</option>
+            <option [value]="UserRole.Admin">Admin</option>
+          </select>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" (click)="closeForm()" class="cancel-btn">Cancelar</button>
+          <button 
+            type="submit" 
+            [disabled]="!userFormRef.valid"
+            class="submit-btn">
+            Actualizar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

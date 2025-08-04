@@ -1,0 +1,181 @@
+<div class="products-container">
+  <div class="header">
+    <h1>Productos</h1>
+    <div class="header-actions">
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          (keyup.enter)="onSearch()"
+          placeholder="Buscar productos..."
+          class="search-input">
+        <button (click)="onSearch()" class="search-btn">🔍</button>
+      </div>
+      <button 
+        *ngIf="canManageProducts()" 
+        (click)="openCreateForm()" 
+        class="create-btn">
+        + Nuevo Producto
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando productos...</div>
+
+  <div class="products-grid" *ngIf="!loading">
+    <div *ngFor="let product of products" class="product-card">
+      <div class="product-image">
+        <img [src]="product.imageUrl || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjY2NjIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzMzMyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=='" 
+             [alt]="product.name">
+      </div>
+      
+      <div class="product-info">
+        <h3>{{ product.name }}</h3>
+        <p class="description">{{ product.description }}</p>
+        
+        <div class="variations">
+          <h4>Colores disponibles:</h4>
+          <div class="variation-list">
+            <div *ngFor="let variation of product.variations" class="variation">
+              <span class="color">{{ variation.color }}</span>
+              <span class="price">${{ variation.price }}</span>
+              <span class="stock">({{ variation.stock }} en stock)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-actions">
+          <div *ngIf="canManageProducts()" class="admin-actions">
+            <button (click)="openEditForm(product)" class="edit-btn">Editar</button>
+            <button 
+              *ngIf="canDeleteProducts()" 
+              (click)="deleteProduct(product)" 
+              class="delete-btn">
+              Eliminar
+            </button>
+          </div>
+          <div class="cart-actions">
+            <select [(ngModel)]="selectedVariations[product.id]" class="color-select">
+              <option [value]="0" disabled>Seleccionar color</option>
+              <option *ngFor="let variation of product.variations" [value]="variation.id">
+                {{ variation.color }} - ${{ variation.price }}
+              </option>
+            </select>
+            <button 
+              (click)="addToCart(product.id)" 
+              [disabled]="!selectedVariations[product.id]"
+              class="add-to-cart-btn">
+              Agregar al Carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="totalPages > 1">
+    <button 
+      (click)="onPageChange(currentPage - 1)" 
+      [disabled]="currentPage === 1"
+      class="page-btn">
+      Anterior
+    </button>
+    
+    <span class="page-info">
+      Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} productos)
+    </span>
+    
+    <button 
+      (click)="onPageChange(currentPage + 1)" 
+      [disabled]="currentPage === totalPages"
+      class="page-btn">
+      Siguiente
+    </button>
+  </div>
+
+  <!-- Modal de formulario -->
+  <div *ngIf="showCreateForm" class="modal-overlay" (click)="closeForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>{{ editingProduct ? 'Editar' : 'Crear' }} Producto</h2>
+      
+      <form (ngSubmit)="onSubmit()" #productFormRef="ngForm">
+        <div class="form-group">
+          <label>Nombre:</label>
+          <input 
+            type="text" 
+            [(ngModel)]="productForm.name" 
+            name="name"
+            required
+            class="form-control">
+        </div>
+        
+        <div class="form-group">
+          <label>Descripción:</label>
+          <textarea 
+            [(ngModel)]="productForm.description" 
+            name="description"
+            class="form-control"
+            rows="3"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>URL de imagen:</label>
+          <input 
+            type="url" 
+            [(ngModel)]="productForm.imageUrl" 
+            name="imageUrl"
+            class="form-control">
+        </div>
+        
+        <div class="variations-section">
+          <h3>Variaciones</h3>
+          
+          <div class="add-variation">
+            <input 
+              type="text" 
+              [(ngModel)]="newVariation.color" 
+              name="newVariationColor"
+              placeholder="Color"
+              class="variation-input">
+            <input 
+              type="number" 
+              [(ngModel)]="newVariation.price" 
+              name="newVariationPrice"
+              placeholder="Precio"
+              min="0"
+              class="variation-input">
+            <input 
+              type="number" 
+              [(ngModel)]="newVariation.stock" 
+              name="newVariationStock"
+              placeholder="Stock"
+              min="0"
+              class="variation-input">
+            <button type="button" (click)="addVariation()" class="add-variation-btn">
+              Agregar
+            </button>
+          </div>
+          
+          <div class="variations-list">
+            <div *ngFor="let variation of productForm.variations; let i = index" 
+                 class="variation-item">
+              <span>{{ variation.color }} - ${{ variation.price }} ({{ variation.stock }})</span>
+              <button type="button" (click)="removeVariation(i)" class="remove-btn">×</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" (click)="closeForm()" class="cancel-btn">Cancelar</button>
+          <button 
+            type="submit" 
+            [disabled]="!productFormRef.valid || productForm.variations.length === 0"
+            class="submit-btn">
+            {{ editingProduct ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

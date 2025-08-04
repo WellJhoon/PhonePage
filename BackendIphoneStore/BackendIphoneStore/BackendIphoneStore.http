@@ -1,0 +1,6 @@
+@BackendIphoneStore_HostAddress = http://localhost:5220
+
+GET {{BackendIphoneStore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

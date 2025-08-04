@@ -1,0 +1,25 @@
+<nav class="navbar">
+  <div class="nav-brand">
+    <a routerLink="/products">📱 iPhone Store</a>
+  </div>
+  
+  <div class="nav-links">
+    <a routerLink="/products" routerLinkActive="active">Productos</a>
+    <a *ngIf="canViewUsers()" routerLink="/users" routerLinkActive="active">Usuarios</a>
+    <a *ngIf="currentUser" routerLink="/cart" routerLinkActive="active">
+      🛒 Carrito ({{ cartItemCount }})
+    </a>
+  </div>
+  
+  <div class="nav-auth">
+    <div *ngIf="currentUser; else loginButton" class="user-menu">
+      <span class="user-info">
+        {{ currentUser.username }} ({{ currentUser.role }})
+      </span>
+      <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+    </div>
+    <ng-template #loginButton>
+      <a routerLink="/login" class="login-link">Iniciar Sesión</a>
+    </ng-template>
+  </div>
+</nav>
